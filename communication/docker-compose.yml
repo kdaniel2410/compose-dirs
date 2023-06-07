@@ -1,0 +1,18 @@
+version: '3'
+
+services:    
+  synapse:
+    container_name: synapse
+    image: matrixdotorg/synapse
+    labels:
+      - homepage.group=Communication
+      - homepage.name=Matrix
+      - homepage.icon=matrix
+      - homepage.href=${PROTOCOL}://matrix.${HOSTNAME}
+    restart: unless-stopped
+    volumes:
+      - ./synapse:/data
+
+networks:
+  default:
+    name: docker
