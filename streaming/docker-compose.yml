@@ -22,6 +22,11 @@ services:
     environment:
      - TZ=${TZ}
     image: jasongdove/ersatztv:latest-vaapi
+    labels:
+      - homepage.group=Streaming
+      - homepage.name=Ersatztv
+      - homepage.icon=ersatztv
+      - homepage.href=${PROTOCOL}://ersatztv.${HOSTNAME}
     restart: unless-stopped
     volumes:
      - ./ersatztv:/root/.local/share/ersatztv
@@ -36,7 +41,7 @@ services:
       - homepage.group=Streaming
       - homepage.name=Jellyseerr
       - homepage.icon=jellyseerr
-      - homepage.href=${HOSTNAME}://jellyseerr.${HOSTNAME}
+      - homepage.href=${PROTOCOL}://jellyseerr.${HOSTNAME}
       - homepage.widget.type=jellyseerr
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=${JELLYSEERR_API_KEY}
