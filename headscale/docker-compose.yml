@@ -3,8 +3,7 @@ version: '3'
 services:
   headscale:
     container_name: headscale
-    command:
-      - headscale serve
+    command: "headscale serve"
     image: headscale/headscale
     restart: unless-stopped
     volumes:
@@ -17,7 +16,7 @@ services:
       - homepage.group=Network
       - homepage.name=Headscale
       - homepage.icon=headscale
-      - homepage.href=${PROTOCOL}://headscale.${HOSTNAME}
+      - homepage.href=${PROTOCOL}://headscale.${HOSTNAME}/web
     restart: unless-stopped
 
 networks:
