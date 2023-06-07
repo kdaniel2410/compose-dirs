@@ -22,6 +22,22 @@ services:
       - ./bazarr:/config
       - ~/storage:/storage
 
+  deemix:
+    container_name: deemix
+    image: registry.gitlab.com/bockiii/deemix-docker
+    labels:
+      - homepage.group=Downloads
+      - homepage.name=Deemix
+      - homepage.icon=deemix
+      - homepage.href=${PROTOCOL}://deemix.${HOSTNAME}
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+    restart: unless-stopped
+    volumes:
+      - ./deemix:/config
+      - ~/storage:/storage
+
   gluetun:
     cap_add:
       - NET_ADMIN
