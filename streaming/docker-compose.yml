@@ -1,0 +1,79 @@
+version: '3'
+
+services:
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf
+    labels:
+      - homepage.group=Streaming
+      - homepage.name=Audiobookshelf
+      - homepage.icon=audiobookshelf
+      - homepage.href=${PROTOCOL}://audiobookshelf.${HOSTNAME}
+    restart: unless-stopped
+    volumes:
+      - ./audiobookshelf/config:/config
+      - ./audiobookshelf/metadata:/metadata
+      - ~/storage:/storage
+
+  ersatztv:
+    container_name: ersatztv
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    environment:
+     - TZ=${TZ}
+    image: jasongdove/ersatztv:latest-vaapi
+    restart: unless-stopped
+    volumes:
+     - ./ersatztv:/root/.local/share/ersatztv
+     - ~/storage:/storage:ro
+
+  jellyseerr:
+    container_name: jellyseerr
+    environment:
+      - TZ=${TZ}
+    image: fallenbagel/jellyseerr
+    labels:
+      - homepage.group=Streaming
+      - homepage.name=Jellyseerr
+      - homepage.icon=jellyseerr
+      - homepage.href=${HOSTNAME}://jellyseerr.${HOSTNAME}
+      - homepage.widget.type=jellyseerr
+      - homepage.widget.url=http://jellyseerr:5055
+      - homepage.widget.key=${JELLYSEERR_API_KEY}
+      - homepage.widget.fields=["pending", "approved", "available"]
+    restart: unless-stopped
+    volumes:
+      - ./jellyseerr:/app/config
+
+  jellyfin:
+    container_name: jellyfin
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    environment:
+      - JELLYFIN_PublishedServerUrl=${IP}
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+    group_add:
+      - "102"
+    image: linuxserver/jellyfin
+    labels:
+      - homepage.group=Streaming
+      - homepage.name=Jellyfin
+      - homepage.icon=jellyfin
+      - homepage.href=${PROTOCOL}://jellyfin.${HOSTNAME}
+      - homepage.widget.type=jellyfin
+      - homepage.widget.url=http://jellyfin:8096
+      - homepage.widget.key=${JELLYFIN_API_KEY}
+    ports:
+      - 8096:8096
+      - 7359:7359/udp
+      - 1900:1900/udp
+    restart: unless-stopped
+    volumes:
+      - ./jellyfin:/config
+      - ~/storage:/storage
+
+networks:
+  default:
+    name: docker

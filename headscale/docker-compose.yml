@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  headscale:
+    container_name: headscale
+    command:
+      - headscale serve
+    image: headscale/headscale
+    restart: unless-stopped
+    volumes:
+      - ./headscale:/etc/headscale
+
+  headscale-ui:
+    container_name: headscale-ui
+    image: ghcr.io/gurucomputing/headscale-ui
+    labels:
+      - homepage.group=Network
+      - homepage.name=Headscale
+      - homepage.icon=headscale
+      - homepage.href=${PROTOCOL}://headscale.${HOSTNAME}
+    restart: unless-stopped
+
+networks:
+  default:
+    name: docker
+

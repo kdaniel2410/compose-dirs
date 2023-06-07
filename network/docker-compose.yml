@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+  acme.sh:
+    command:
+      - daemon
+    container_name: acme.sh
+    image: neilpang/acme.sh
+    network_mode: host
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./acme.sh:/acme.sh
+
+  authelia:
+    container_name: authelia
+    image: authelia/authelia
+    labels:
+      - homepage.group=Network
+      - homepage.name=Authelia
+      - homepage.icon=authelia
+      - homepage.href=${PROTOCOL}://authelia.${HOSTNAME}
+    volumes:
+      - ./authelia:/config
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+
+  caddy:
+    container_name: caddy
+    image: caddy
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - ./acme.sh:/acme.sh
+      - ./caddy:/etc/caddy
+
+  docker-proxy:
+    container_name: docker-proxy
+    environment:
+      - CONTAINERS=1 # Allow access to viewing containers
+      - POST=0 # Disallow any POST operations (effectively read-only)
+    image: ghcr.io/tecnativa/docker-socket-proxy
+    ports:
+      - 2375:2375
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
+
+  homepage:
+    container_name: homepage
+    image: ghcr.io/benphelps/homepage
+    restart: unless-stopped
+    volumes:
+      - ./homepage:/app/config
+      - ~/storage:/storage
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  librespeed:
+    container_name: librespeed
+    environment:
+      - MODE=standalone
+    image: adolfintel/speedtest
+    labels:
+      - homepage.group=Network
+      - homepage.name=Librespeed
+      - homepage.icon=librespeed
+      - homepage.href=${PROTOCOL}://librespeed.${HOSTNAME}
+    restart: unless-stopped
+
+networks:
+  default:
+    name: docker

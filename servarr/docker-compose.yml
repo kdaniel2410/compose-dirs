@@ -1,0 +1,175 @@
+version: '3'
+
+services:
+  bazarr:
+    container_name: bazarr
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+    image: linuxserver/bazarr
+    labels:
+      - homepage.group=Servarr
+      - homepage.name=Bazarr
+      - homepage.icon=bazarr
+      - homepage.href=${PROTOCOL}://bazarr.${HOSTNAME}
+      - homepage.widget.type=bazarr
+      - homepage.widget.url=http://bazarr:6767
+      - homepage.widget.key=${BAZARR_API_KEY}
+      - homepage.widget.fields=["missingEpisodes", "missingMovies"]
+    restart: unless-stopped
+    volumes:
+      - ./bazarr:/config
+      - ~/storage:/storage
+
+  gluetun:
+    cap_add:
+      - NET_ADMIN
+    container_name: gluetun
+    environment:
+      - SERVER_CITIES=${SERVER_CITIES}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=wireguard
+    image: qmcgaw/gluetun
+    labels:
+      - homepage.group=Network
+      - homepage.name=Gluetun
+      - homepage.widget.type=gluetun
+      - homepage.widget.url=http://gluetun:8000
+      - homepage.widget.fields=["public_ip", "region", "country"]
+      - com.centurylinklabs.watchtower.enable=false
+    restart: unless-stopped
+
+  jackett:
+    container_name: jackett
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+    image: linuxserver/jackett
+    labels:
+      - homepage.group=Downloads
+      - homepage.name=Jackett
+      - homepage.icon=jackett
+      - homepage.href=${PROTOCOL}://jackett.${HOSTNAME}
+      - homepage.widget.type=jackett
+      - homepage.widget.url=http://gluetun:9117
+      - homepage.widget.fields=["configured", "errored"]
+      - com.centurylinklabs.watchtower.enable=false
+    network_mode: "service:gluetun"
+    restart: unless-stopped
+    volumes:
+      - ./jackett:/config
+      - ~/storage:/storage
+
+  lidarr:
+    container_name: lidarr
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+    image: linuxserver/lidarr
+    labels:
+      - homepage.group=Servarr
+      - homepage.name=Lidarr
+      - homepage.icon=lidarr
+      - homepage.href=${PROTOCOL}://lidarr.${HOSTNAME}
+      - homepage.widget.type=lidarr
+      - homepage.widget.url=http://lidarr:8686
+      - homepage.widget.key=${LIDARR_API_KEY}
+      - homepage.widget.fields=["wanted", "queued", "albums"]
+    restart: unless-stopped
+    volumes:
+      - ./lidarr:/config
+      - ~/storage:/storage
+
+  radarr:
+    container_name: radarr
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+    image: linuxserver/radarr
+    labels:
+      - homepage.group=Servarr
+      - homepage.name=Radarr
+      - homepage.icon=radarr
+      - homepage.href=${PROTOCOL}://radarr.${HOSTNAME}
+      - homepage.widget.type=radarr
+      - homepage.widget.url=http://radarr:7878
+      - homepage.widget.key=${RADARR_API_KEY}
+      - homepage.widget.fields=["wanted", "missing", "queued", "movies"]
+    restart: unless-stopped
+    volumes:
+      - ./radarr:/config
+      - ~/storage:/storage
+
+  readarr:
+    container_name: readarr
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+    image: linuxserver/readarr:develop
+    labels:
+      - homepage.group=Servarr
+      - homepage.name=Readarr
+      - homepage.icon=readarr
+      - homepage.href=${PROTOCOL}://readarr.${HOSTNAME}
+      - homepage.widget.type=readarr
+      - homepage.widget.url=http://readarr:8787
+      - homepage.widget.key=${READARR_API_KEY}
+      - homepage.widget.fields=["wanted", "queued", "books"]
+    restart: unless-stopped
+    volumes:
+      - ./readarr:/config
+      - ~/storage:/storage
+
+  sonarr:
+    container_name: sonarr
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+    image: linuxserver/sonarr
+    labels:
+      - homepage.group=Servarr
+      - homepage.name=Sonarr
+      - homepage.icon=sonarr
+      - homepage.href=${PROTOCOL}://sonarr.${HOSTNAME}
+      - homepage.widget.type=sonarr
+      - homepage.widget.url=http://sonarr:8989
+      - homepage.widget.key=${SONARR_API_KEY}
+      - homepage.widget.fields=["wanted", "queued", "series"]
+    restart: unless-stopped
+    volumes:
+      - ./sonarr:/config
+      - ~/storage:/storage
+
+  transmission:
+    container_name: transmission
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+    image: linuxserver/transmission
+    labels:
+      - homepage.group=Downloads
+      - homepage.name=Transmission
+      - homepage.icon=transmission
+      - homepage.href=${PROTOCOL}://transmission.${HOSTNAME}
+      - homepage.widget.type=transmission
+      - homepage.widget.url=http://gluetun:9091
+      - homepage.widget.fields=["leech", "download", "seed", "upload"]
+      - com.centurylinklabs.watchtower.enable=false
+    network_mode: "service:gluetun"
+    restart: unless-stopped
+    volumes:
+      - ./transmission:/config
+      - ~/storage:/storage
+
+networks:
+  default:
+    name: docker
