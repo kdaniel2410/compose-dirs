@@ -15,17 +15,17 @@ services:
 
   authelia:
     container_name: authelia
+    environment:
+      - TZ=${TZ}
     image: authelia/authelia
     labels:
       - homepage.group=Network
       - homepage.name=Authelia
       - homepage.icon=authelia
       - homepage.href=${PROTOCOL}://authelia.${HOSTNAME}
+    restart: unless-stopped
     volumes:
       - ./authelia:/config
-    restart: unless-stopped
-    environment:
-      - TZ=${TZ}
 
   caddy:
     container_name: caddy
@@ -70,6 +70,24 @@ services:
       - homepage.icon=librespeed
       - homepage.href=${PROTOCOL}://librespeed.${HOSTNAME}
     restart: unless-stopped
+
+  lldap:
+    container_name: lldap
+    environment:
+      - UID=${UID}
+      - GID=${GID}
+      - TZ=${TZ}
+      - LLDAP_JWT_SECRET=${LLDAP_JWT_SECRET}
+      - LLDAP_LDAP_USER_PASS=${LLDAP_LDAP_USER_PASS}
+      - LLDAP_LDAP_BASE_DN=${LLDAP_LDAP_BASE_DN}
+    image: nitnelave/lldap
+    labels:
+      - homepage.group=Network
+      - homepage.name=LLDAP
+      - homepage.icon=lldap
+      - homepage.href=${PROTOCOL}://lldap.${HOSTNAME}
+    volumes:
+      - ./lldap:/data
 
 networks:
   default:
