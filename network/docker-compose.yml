@@ -50,6 +50,17 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
 
+  duckdns:
+    container_name: duckdns
+    image: lscr.io/linuxserver/duckdns
+    environment:
+      - PUID=${UID}
+      - PGID=${UID}
+      - TZ=${TZ}
+      - SUBDOMAINS=${DUCKDNS_SUBDOMAINS}
+      - TOKEN=${DUCKDNS_TOKEN}
+    restart: unless-stopped
+
   homepage:
     container_name: homepage
     image: ghcr.io/benphelps/homepage
