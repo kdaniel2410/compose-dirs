@@ -27,7 +27,6 @@ services:
       - homepage.name=Uptime
       - homepage.icon=uptime-kuma
       - homepage.href=${PROTOCOL}://uptime.${HOSTNAME}
-      - homepage.showStats=true
     restart: unless-stopped
     volumes:
       - ./uptime-kuma:/app/data
