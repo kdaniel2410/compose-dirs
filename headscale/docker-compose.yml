@@ -15,7 +15,7 @@ services:
     labels:
       - homepage.group=Network
       - homepage.name=Headscale
-      - homepage.icon=headscale
+      - homepage.icon=tailscale
       - homepage.href=${PROTOCOL}://headscale.${HOSTNAME}/web
     restart: unless-stopped
 
